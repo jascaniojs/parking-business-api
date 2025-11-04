@@ -27,7 +27,7 @@ export class ParkingSpaceRepository {
   }
 
   async getAvailableSpace(
-    buildingId: string,
+    buildingId: number,
     vehicleType: VehicleType,
     isResident: boolean,
   ): Promise<ParkingSpace | null> {
@@ -35,10 +35,13 @@ export class ParkingSpaceRepository {
       .createQueryBuilder('space')
       .where('space.buildingId = :buildingId', { buildingId })
       .andWhere('space.currentSessionId IS NULL')
-      .andWhere('space.allowedVehicleType = :vehicleType', { vehicleType });
 
-    if (!isResident) {
-      query.andWhere('space.isForResidents = false');
+    if (isResident) {
+      query.andWhere('space.isForResidents = true');
+    }
+
+    if(!isResident){
+        query.andWhere('space.allowedVehicleType = :vehicleType', { vehicleType });
     }
 
     return query.orderBy('space.floor', 'ASC').addOrderBy('space.number', 'ASC').getOne();
