@@ -91,7 +91,7 @@ describe('ParkingSpace Entity', () => {
 
     it('should return false when currentSessionId is set', () => {
       const space = ParkingSpace.create(1, 1, 10, VehicleType.CAR);
-      space.currentSessionId = 123;
+      space.currentSessionId = '550e8400-e29b-41d4-a716-446655440000';
 
       expect(space.isAvailable()).toBe(false);
     });
@@ -101,18 +101,18 @@ describe('ParkingSpace Entity', () => {
     it('should set currentSessionId when space is available', () => {
       const space = ParkingSpace.create(1, 1, 10, VehicleType.CAR);
 
-      space.occupy(456);
+      space.occupy('650e8400-e29b-41d4-a716-446655440001');
 
-      expect(space.currentSessionId).toBe(456);
+      expect(space.currentSessionId).toBe('650e8400-e29b-41d4-a716-446655440001');
       expect(space.isAvailable()).toBe(false);
     });
 
     it('should throw error when space is already occupied', () => {
       const space = ParkingSpace.create(1, 1, 10, VehicleType.CAR);
-      space.occupy(123);
+      space.occupy('550e8400-e29b-41d4-a716-446655440000');
 
       expect(() => {
-        space.occupy(456);
+        space.occupy('650e8400-e29b-41d4-a716-446655440001');
       }).toThrow('Parking space Floor 1 - Space 10 is already occupied');
     });
   });
@@ -120,7 +120,7 @@ describe('ParkingSpace Entity', () => {
   describe('release', () => {
     it('should clear currentSessionId', () => {
       const space = ParkingSpace.create(1, 1, 10, VehicleType.CAR);
-      space.occupy(123);
+      space.occupy('550e8400-e29b-41d4-a716-446655440000');
 
       space.release();
 

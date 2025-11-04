@@ -22,7 +22,7 @@ describe('ParkingSpacesController - Occupation (e2e)', () => {
   async function performCheckIn(
     vehicleType: VehicleType,
     isResident: boolean,
-  ): Promise<{ parkingSessionId: number; parkingSpaceId: number }> {
+  ): Promise<{ parkingSessionId: string; parkingSpaceId: number }> {
     const response = await request(app.getHttpServer())
       .post('/parking-sessions/check-in')
       .set('Authorization', `Bearer ${testData.authToken}`)

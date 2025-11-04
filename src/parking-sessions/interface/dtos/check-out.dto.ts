@@ -1,16 +1,15 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsPositive } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsUUID } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CheckOutDto {
   @ApiProperty({
     description: 'ID of the parking session to check out',
-    example: 123,
-    type: Number,
+    example: '550e8400-e29b-41d4-a716-446655440000',
+    type: String,
   })
-  @IsNumber({}, { message: 'parkingSessionId must be a valid number' })
-  @IsPositive({ message: 'parkingSessionId must be a positive number' })
+  @IsUUID('4', { message: 'parkingSessionId must be a valid UUID' })
   @IsNotEmpty({ message: 'parkingSessionId is required' })
-  parkingSessionId: number;
+  parkingSessionId: string;
 
   @ApiProperty({
     description: 'Whether the driver is a resident (must match the session)',

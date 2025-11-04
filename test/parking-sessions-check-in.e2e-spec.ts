@@ -67,7 +67,10 @@ describe('ParkingSessionsController - Check-in (e2e)', () => {
 
       expect(response.body).toHaveProperty('parkingSessionId');
       expect(response.body).toHaveProperty('parkingSpaceId');
-      expect(typeof response.body.parkingSessionId).toBe('number');
+      expect(typeof response.body.parkingSessionId).toBe('string');
+      expect(response.body.parkingSessionId).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
+      );
       expect(typeof response.body.parkingSpaceId).toBe('number');
 
       // Verify that the parking space is now occupied

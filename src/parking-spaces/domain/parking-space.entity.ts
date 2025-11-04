@@ -42,7 +42,7 @@ export class ParkingSpace {
   isForResidents: boolean;
 
   @Column({ name: 'current_session_id', nullable: true })
-  currentSessionId: number | null;
+  currentSessionId: string | null;
 
   @OneToOne(() => ParkingSession, { nullable: true })
   @JoinColumn({ name: 'current_session_id' })
@@ -58,7 +58,7 @@ export class ParkingSpace {
     return this.currentSessionId === null;
   }
 
-  occupy(sessionId: number): void {
+  occupy(sessionId: string): void {
     if (!this.isAvailable()) {
       throw new Error(`Parking space ${this.getSpaceCode()} is already occupied`);
     }

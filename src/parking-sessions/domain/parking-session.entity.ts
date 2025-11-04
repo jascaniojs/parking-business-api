@@ -12,8 +12,8 @@ import { VehicleType } from '../../parking-spaces/domain/vehicle-type.enum';
 
 @Entity('parking_sessions')
 export class ParkingSession {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @Column({ name: 'parking_space_id' })
   parkingSpaceId: number;

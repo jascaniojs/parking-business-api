@@ -14,7 +14,7 @@ export class ParkingSessionRepository {
     return this.repository.save(session);
   }
 
-  async findById(id: number): Promise<ParkingSession | null> {
+  async findById(id: string): Promise<ParkingSession | null> {
     return this.repository.findOne({
       where: { id },
       relations: ['parkingSpace'],

@@ -23,7 +23,7 @@ describe('ParkingSessionsController - Check-out (e2e)', () => {
   async function performCheckIn(
     vehicleType: VehicleType,
     isResident: boolean,
-  ): Promise<{ parkingSessionId: number; parkingSpaceId: number }> {
+  ): Promise<{ parkingSessionId: string; parkingSpaceId: number }> {
     const response = await request(app.getHttpServer())
       .post('/parking-sessions/check-in')
       .set('Authorization', `Bearer ${testData.authToken}`)
@@ -236,9 +236,9 @@ describe('ParkingSessionsController - Check-out (e2e)', () => {
   });
 
   describe('POST /parking-sessions/check-out - Bad Request Cases', () => {
-    it('should return 400 when parkingSessionId is invalid (negative number)', async () => {
+    it('should return 400 when parkingSessionId is invalid (not a UUID)', async () => {
       const checkOutDto = {
-        parkingSessionId: -1,
+        parkingSessionId: 'invalid-uuid',
         isResident: false,
       };
 
@@ -252,7 +252,7 @@ describe('ParkingSessionsController - Check-out (e2e)', () => {
         expect.arrayContaining([expect.stringContaining('parkingSessionId')]),
       );
       expect(response.body.message).toEqual(
-        expect.arrayContaining([expect.stringContaining('positive')]),
+        expect.arrayContaining([expect.stringContaining('UUID')]),
       );
     });
 
@@ -281,7 +281,7 @@ describe('ParkingSessionsController - Check-out (e2e)', () => {
 
     it('should return 404 when parking session does not exist', async () => {
       const checkOutDto = {
-        parkingSessionId: 99999,
+        parkingSessionId: '550e8400-e29b-41d4-a716-446655440000',
         isResident: false,
       };
 
