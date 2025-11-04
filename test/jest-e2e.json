@@ -11,5 +11,6 @@
   "maxWorkers": 1,
   "moduleNameMapper": {
     "^src/(.*)$": "<rootDir>/../src/$1"
-  }
+  },
+  "verbose": true
 }

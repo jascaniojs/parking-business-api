@@ -8,6 +8,7 @@ import {
   ApiInternalServerErrorResponse,
   ApiNotFoundResponse,
   ApiBadRequestResponse,
+  ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
 import { ParkingSessionsService } from '../domain/parking-sessions.service';
 import { CheckInDto } from './dtos/check-in.dto';
@@ -80,7 +81,7 @@ export class ParkingSessionsController {
     },
   })
   @ApiBadRequestResponse({
-    description: 'Session already finished or isResident mismatch',
+    description: 'Session already finished',
     schema: {
       type: 'object',
       properties: {
@@ -88,6 +89,19 @@ export class ParkingSessionsController {
         message: {
           type: 'string',
           example: 'Parking session is already finished.',
+        },
+      },
+    },
+  })
+  @ApiUnprocessableEntityResponse({
+    description: 'isResident value does not match session',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: { type: 'number', example: 422 },
+        message: {
+          type: 'string',
+          example: 'Invalid isResident value. Session is for residents.',
         },
       },
     },
