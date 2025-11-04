@@ -62,4 +62,11 @@ export class ParkingSpaceRepository {
   async delete(id: string): Promise<void> {
     await this.repository.delete(id);
   }
+
+  async findAllWithSessions(): Promise<ParkingSpace[]> {
+    return this.repository.find({
+      relations: ['currentSession'],
+      order: { floor: 'ASC', number: 'ASC' },
+    });
+  }
 }
