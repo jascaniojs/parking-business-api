@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, EntityManager } from 'typeorm';
 import { ParkingSpace } from '../domain/parking-space.entity';
 import { VehicleType } from '../domain/vehicle-type.enum';
 
@@ -30,9 +30,13 @@ export class ParkingSpaceRepository {
     buildingId: number,
     vehicleType: VehicleType,
     isResident: boolean,
+    entityManager?: EntityManager,
   ): Promise<ParkingSpace | null> {
-    const query = this.repository
-      .createQueryBuilder('space')
+    // Use transaction manager if provided, otherwise use default repository
+    const manager = entityManager || this.repository.manager;
+
+    const query = manager
+      .createQueryBuilder(ParkingSpace, 'space')
       .where('space.buildingId = :buildingId', { buildingId })
       .andWhere('space.currentSessionId IS NULL')
 
@@ -44,7 +48,11 @@ export class ParkingSpaceRepository {
         query.andWhere('space.allowedVehicleType = :vehicleType', { vehicleType });
     }
 
-    return query.orderBy('space.floor', 'ASC').addOrderBy('space.number', 'ASC').getOne();
+    return query
+      .orderBy('space.floor', 'ASC')
+      .addOrderBy('space.number', 'ASC')
+      .setLock('pessimistic_write')
+      .getOne();
   }
 
   async update(space: ParkingSpace): Promise<ParkingSpace> {

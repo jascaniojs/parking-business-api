@@ -24,11 +24,12 @@ export class ParkingSessionsService {
     const { buildingId, vehicleType, isResident } = dto;
 
     try {
-      return await this.dataSource.transaction(async (trx) => {
+      return await this.dataSource.transaction(async (entityManager) => {
         const availableSpace = await this.parkingSpaceRepository.getAvailableSpace(
           buildingId,
           vehicleType,
           isResident,
+          entityManager,
         );
 
         if (!availableSpace) {
@@ -55,11 +56,11 @@ export class ParkingSessionsService {
           ratePerHour,
         );
 
-        const savedSession = await trx.save(ParkingSession, parkingSession);
+        const savedSession = await entityManager.save(ParkingSession, parkingSession);
 
         availableSpace.occupy(savedSession.id);
 
-        await trx.save(availableSpace);
+        await entityManager.save(availableSpace);
 
         return {
           parkingSessionId: savedSession.id,

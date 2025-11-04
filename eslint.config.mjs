@@ -89,10 +89,19 @@ export default [
   // Test files specific configuration
   {
     files: ['**/*.spec.ts', '**/*.e2e-spec.ts', 'test/**/*.ts'],
+    languageOptions: {
+      parser: tsparser,
+      parserOptions: {
+        project: './tsconfig.test.json',
+        tsconfigRootDir: process.cwd(),
+        sourceType: 'module',
+      },
+    },
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       'max-lines': 'off',
       'max-params': 'off',
+      'no-console': 'off',
     },
   },
 
