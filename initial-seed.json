@@ -1,0 +1,43 @@
+{
+  "building": {
+    "name": "Parking Business",
+    "address": "221B Baker Street",
+    "totalFloors": 2
+  },
+  "prices": [
+    {
+      "vehicleType": "CAR",
+      "ratePerHour": 5.0
+    },
+    {
+      "vehicleType": "MOTORCYCLE",
+      "ratePerHour": 3.0
+    }
+  ],
+  "parkingSpaces": [
+    {
+      "range": [1, 50],
+      "floor": 1,
+      "isForResidents": true,
+      "allowedVehicleType": null
+    },
+    {
+      "range": [51, 75],
+      "floor": 1,
+      "isForResidents": false,
+      "allowedVehicleType": "CAR"
+    },
+    {
+      "range": [76, 130],
+      "floor": 2,
+      "isForResidents": false,
+      "allowedVehicleType": "CAR"
+    },
+    {
+      "range": [131, 150],
+      "floor": 2,
+      "isForResidents": false,
+      "allowedVehicleType": "MOTORCYCLE"
+    }
+  ]
+}
