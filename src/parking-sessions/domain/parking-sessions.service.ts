@@ -2,6 +2,8 @@ import {
   Injectable,
   ConflictException,
   InternalServerErrorException,
+  NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { ParkingSessionRepository } from '../infrastructure/parking-session.repository';
@@ -9,7 +11,10 @@ import { ParkingSpaceRepository } from '../../parking-spaces/infrastructure/park
 import { PriceRepository } from '../../prices/infrastructure/price.repository';
 import { CheckInDto } from '../interface/dtos/check-in.dto';
 import { CheckInResponseDto } from '../interface/dtos/check-in-response.dto';
+import { CheckOutDto } from '../interface/dtos/check-out.dto';
+import { CheckOutResponseDto } from '../interface/dtos/check-out-response.dto';
 import { ParkingSession } from './parking-session.entity';
+import { ParkingSpace } from '../../parking-spaces/domain/parking-space.entity';
 
 @Injectable()
 export class ParkingSessionsService {
@@ -60,7 +65,7 @@ export class ParkingSessionsService {
 
         availableSpace.occupy(savedSession.id);
 
-        await entityManager.save(availableSpace);
+        await entityManager.save(ParkingSpace, availableSpace);
 
         return {
           parkingSessionId: savedSession.id,
@@ -76,6 +81,58 @@ export class ParkingSessionsService {
       }
 
       throw new InternalServerErrorException('Error creating parking session.');
+    }
+  }
+
+  async checkOut(dto: CheckOutDto): Promise<CheckOutResponseDto> {
+    const { parkingSessionId, isResident } = dto;
+
+    try {
+      // Find the parking session
+      const session = await this.parkingSessionRepository.findById(parkingSessionId);
+
+      if (!session) {
+        throw new NotFoundException('Parking session not found.');
+      }
+
+      // Validate session is still active
+      if (!session.isActive()) {
+        throw new BadRequestException('Parking session is already finished.');
+      }
+
+      // Validate isResident matches the session
+      if (session.isResident !== isResident) {
+        throw new BadRequestException(
+          `Invalid isResident value. Session is ${session.isResident ? 'for residents' : 'for non-residents'}.`,
+        );
+      }
+
+      // Process check-out within transaction
+      return await this.dataSource.transaction(async (entityManager) => {
+          const parkingSpace = await this.parkingSpaceRepository.findById(session.parkingSpaceId);
+          if (!parkingSpace) {
+              throw new NotFoundException('Parking space not found.');
+          }
+        session.checkOut();
+        await entityManager.save(ParkingSession, session);
+        parkingSpace.release();
+        await entityManager.save(ParkingSpace, parkingSpace);
+
+        return {
+          sessionLengthInHoursMinutes: session.getDurationInHours(),
+          parkingSpaceId: session.parkingSpaceId,
+          calculatedCharge: Number(session.calculatedCharge),
+          fee: Number(session.ratePerHour),
+        };
+      });
+    } catch (error) {
+      if (
+        error instanceof NotFoundException ||
+        error instanceof BadRequestException ) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException('Error finishing parking session.');
     }
   }
 }

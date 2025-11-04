@@ -67,8 +67,7 @@ export class ParkingSession {
   getDurationInHours(): number {
     const endTime = this.checkOutAt || new Date();
     const durationMs = endTime.getTime() - this.checkInAt.getTime();
-    const hours = durationMs / (1000 * 60 * 60);
-    return Math.ceil(hours);
+    return durationMs / (1000 * 60 * 60); //(millisecons * minutes * hours)
   }
 
   calculateCharge(): number {
