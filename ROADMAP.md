@@ -8,7 +8,7 @@
 
 ### **Requirements**
 
-* **Goal:** Implement a scalable endpoint to retrieve non-resident parking session history.
+* **Goal:** Implement an endpoint to retrieve non-resident parking session history.
 * **Endpoint:** `GET /parking-sessions/history`
 * **Response Status:** `200 OK`
 * **Response Body (Minimum Fields):**

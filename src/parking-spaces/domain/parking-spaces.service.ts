@@ -1,41 +1,37 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { ParkingSpaceRepository } from '../infrastructure/parking-space.repository';
 import { OccupationResponseDto } from '../interface/dtos/occupation-response.dto';
-import { VehicleType } from './vehicle-type.enum';
+import { DashboardResponseDto } from '../interface/dtos/occupation-dashboard.dto';
+import { PriceRepository } from '../../prices/infrastructure/price.repository';
+import { BuildingRepository } from '../../buildings/infrastructure/building.repository';
 
 @Injectable()
 export class ParkingSpacesService {
   constructor(
     private readonly parkingSpaceRepository: ParkingSpaceRepository,
+    private readonly priceRepository: PriceRepository,
+    private readonly buildingRepository: BuildingRepository,
   ) {}
 
   async getOccupation(): Promise<OccupationResponseDto[]> {
     const spaces = await this.parkingSpaceRepository.findAllWithSessions();
+    return spaces.map((space) => OccupationResponseDto.fromEntity(space));
+  }
 
-    return spaces.map((space) => {
-      const isOccupied = !space.isAvailable();
+  async getDashboardData(buildingId: number): Promise<DashboardResponseDto> {
+    // Fetch building
+    const building = await this.buildingRepository.findById(buildingId);
+    if (!building) {
+      throw new NotFoundException(`Building with ID ${buildingId} not found`);
+    }
 
-      // Determine vehicleType based on business rules
-      let vehicleType: VehicleType | null;
+    // Fetch occupation data
+    const occupation = await this.getOccupation();
 
-      if (isOccupied && space.currentSession) {
-        // When occupied: show actual vehicle type from session
-        vehicleType = space.currentSession.vehicleType;
-      } else if (space.isForResidents) {
-        // Resident-only space when vacant: null
-        vehicleType = null;
-      } else {
-        // Non-resident space when vacant: show allowed vehicle type
-        vehicleType = space.allowedVehicleType;
-      }
+    // Fetch pricing data
+    const prices = await this.priceRepository.getBy(buildingId);
 
-      return {
-        parkingSpaceId: space.id,
-        number: space.number,
-        vehicleType,
-        isOccupied,
-        isResident: space.isForResidents,
-      };
-    });
+    // Use DTO mapper to transform data
+    return DashboardResponseDto.fromOccupationData(occupation, prices, building.name);
   }
 }

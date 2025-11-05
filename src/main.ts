@@ -5,9 +5,12 @@ import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './shared/filters/http-exception.filter';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'node:path';
+import { engine } from 'express-handlebars';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('app.port') || 3000;
@@ -27,7 +30,9 @@ async function bootstrap() {
   );
 
   // Global exception filter
-  app.useGlobalFilters(new AllExceptionsFilter());
+  if (process.env.NODE_ENV !== 'development') {
+    app.useGlobalFilters(new AllExceptionsFilter());
+  }
 
   // Swagger documentation
   const swaggerEnabled = process.env.SWAGGER_ENABLED !== 'false';
@@ -36,10 +41,7 @@ async function bootstrap() {
       .setTitle('Parking Business API')
       .setDescription('API for parking business management')
       .setVersion('1.0')
-      .addBearerAuth(
-        { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' },
-        'JWT',
-      )
+      .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }, 'JWT')
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
@@ -47,6 +49,23 @@ async function bootstrap() {
       customSiteTitle: 'Parking Business API Documentation',
     });
   }
+
+  // --- 1. Configure Handlebars Engine ---
+  app.engine(
+    'hbs',
+    engine({
+      extname: '.hbs',
+      defaultLayout: 'main',
+      layoutsDir: join(__dirname, '..', 'views', 'layouts'),
+      helpers: {
+        eq: <T>(a: T, b: T) => a === b,
+      },
+    }),
+  );
+
+  // --- 2. Set View Engine and Views Directory ---
+  app.set('view engine', 'hbs');
+  app.setBaseViewsDir(join(__dirname, '..', 'views'));
 
   await app.listen(port);
   console.log(`Application is running on: http://localhost:${port}`);

@@ -1,0 +1,129 @@
+<header class="dashboard-header">
+    <h1>Parking Management</h1>
+    <p>Real-time monitoring</p>
+</header>
+
+<section class="stats-summary">
+    <div class="stat-card">
+        <div class="stat-info">
+            <p class="stat-label">Residential Spaces</p>
+            <div class="stat-value-row">
+                <h2>{{stats.residential}}</h2>
+                <p class="stat-suffix">Available</p>
+            </div>
+        </div>
+        <div class="stat-icon-wrapper car-icon"><span>&#127968;</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <p class="stat-label">Paid Car Spaces</p>
+            <div class="stat-value-row">
+                <h2>{{stats.paidCar}}</h2>
+                <p class="stat-suffix">Available</p>
+            </div>
+        </div>
+        <div class="stat-icon-wrapper car-icon"><span>🚗</span></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-info">
+            <p class="stat-label">Paid Motorcycle Spaces</p>
+            <div class="stat-value-row">
+                <h2>{{stats.paidMotorcycle}}</h2>
+                <p class="stat-suffix">Available</p>
+            </div>
+        </div>
+        <div class="stat-icon-wrapper motorcycle-icon"><span>🛵</span></div>
+    </div>
+</section>
+
+<div class="main-content">
+
+    <main class="parking-layout">
+        {{#each floors}}
+            <div class="floor-section">
+                <h2>{{this.name}}</h2>
+                <div class="floor-grid">
+                    {{#each this.rows}}
+                        {{#each this}}
+                        {{!-- Render a Parking Spot --}}
+                            {{#if this.isSpot}}
+                                <div class="spot {{this.status}} {{this.vehicle}}">
+                                <span class="spot-icon">
+                                    {{#if (eq this.residential true)}}&#127968;{{/if}}
+                                    {{#if (eq this.vehicle "car")}}🚗{{/if}}
+                                    {{#if (eq this.vehicle "motorcycle")}}🛵{{/if}}
+                                </span>
+                                    <span class="spot-id">{{this.id}}</span>
+                                </div>
+
+                            {{!-- Render an Aisle Label --}}
+                            {{else if this.isAisle}}
+                                <div class="aisle-label">
+                                    <span>AISLE</span>
+                                </div>
+
+                            {{!-- Render a Street Separator --}}
+                            {{else if this.isStreet}}
+                                <div class="street-separator">
+                                    <span>← STREET →</span>
+                                </div>
+
+                            {{!-- Render an Empty Cell for spacing --}}
+                            {{else}}
+                                <div class="empty-cell"></div>
+                            {{/if}}
+                        {{/each}}
+                    {{/each}}
+                </div>
+            </div>
+        {{/each}}
+    </main>
+
+    <aside class="sidebar">
+        <div class="legend-card">
+            <h3>Status Legend</h3>
+            <div class="legend-item">
+                <div class="legend-item-content">
+                    <span class="legend-box available"></span>
+                    <span class="legend-text available-text">Available</span>
+                </div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-item-content">
+                    <span class="legend-box occupied"></span>
+                    <span class="legend-text occupied-text">Occupied</span>
+                </div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-item-content">
+                    <span class="legend-icon">&#127968;</span>
+                    <span class="legend-text">Residents Only</span>
+                </div>
+            </div>
+        </div>
+        <div class="legend-card">
+            <h3>Hourly Rates</h3>
+            <div class="fee-item">
+                <div class="fee-item-left">
+                    <span class="legend-icon">🚗</span>
+                    <span class="fee-vehicle-type">Car</span>
+                </div>
+                <div>
+                    <span class="fee-amount">{{fee.car}}</span>
+                    <span class="fee-currency">EUR/h</span>
+                </div>
+            </div>
+            <div class="fee-item">
+                <div class="fee-item-left">
+                    <span class="legend-icon">🛵</span>
+                    <span class="fee-vehicle-type">Motorcycle</span>
+                </div>
+                <div>
+                    <span class="fee-amount">{{fee.motorcycle}}</span>
+                    <span class="fee-currency">EUR/h</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+</div>

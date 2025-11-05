@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { VehicleType } from '../../domain/vehicle-type.enum';
+import { ParkingSpace } from '../../domain/parking-space.entity';
 
 export class OccupationResponseDto {
   @ApiProperty({
@@ -38,4 +39,33 @@ export class OccupationResponseDto {
     type: Boolean,
   })
   isResident: boolean;
+
+  @ApiProperty({
+    description: 'Floor number',
+    example: 1,
+    type: Number,
+  })
+  floor: number;
+
+  static fromEntity(space: ParkingSpace): OccupationResponseDto {
+    const isOccupied = !space.isAvailable();
+    let vehicleType: VehicleType | null;
+
+    if (isOccupied && space.currentSession) {
+      vehicleType = space.currentSession.vehicleType;
+    } else if (space.isForResidents) {
+      vehicleType = null;
+    } else {
+      vehicleType = space.allowedVehicleType;
+    }
+
+    return {
+      parkingSpaceId: space.id,
+      number: space.number,
+      vehicleType,
+      isOccupied,
+      isResident: space.isForResidents,
+      floor: space.floor,
+    };
+  }
 }

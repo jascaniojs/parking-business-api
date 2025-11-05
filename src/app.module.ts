@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { APP_GUARD } from '@nestjs/core';
@@ -10,6 +10,7 @@ import { JwtAuthGuard } from './auth/interface/guards/jwt-auth.guard';
 import { ParkingSessionsModule } from './parking-sessions/parking-sessions.module';
 import { ParkingSpacesModule } from './parking-spaces/parking-spaces.module';
 import { PricesModule } from './prices/prices.module';
+import { LoggerMiddleware } from './shared/middleware/http-logger.middleware';
 
 @Module({
   imports: [
@@ -40,4 +41,10 @@ import { PricesModule } from './prices/prices.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware) // <-- Apply your middleware
+      .forRoutes('*'); // <-- For all routes in the app
+  }
+}
