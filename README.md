@@ -31,7 +31,7 @@ src/
 ├── parking-spaces/         # Space management & occupation tracking
 ├── buildings/              # Building management
 ├── prices/                 # Pricing rules
-└── shared/                 # Infrastructur
+└── shared/                 # Infrastructure
 ```
 Each domain follows:
 - `domain/` - Business logic & entities
