@@ -4,11 +4,7 @@ import request from 'supertest';
 import { DataSource } from 'typeorm';
 import { AppModule } from '../src/app.module';
 import { VehicleType } from '../src/parking-spaces/domain/vehicle-type.enum';
-import {
-  setupTestDatabase,
-  teardownTestDatabase,
-  clearTestDatabase,
-} from './test-db-setup';
+import { setupTestDatabase, teardownTestDatabase, clearTestDatabase } from './test-db-setup';
 import { seedTestData, TestSeedData } from './helpers/seed-test-data';
 
 describe('ParkingSpacesController - Occupation (e2e)', () => {
@@ -118,9 +114,7 @@ describe('ParkingSpacesController - Occupation (e2e)', () => {
         .expect(200);
 
       // Find resident-only spaces (should be vacant and have null vehicleType)
-      const residentSpaces = response.body.filter(
-        (space: any) => space.isResident === true,
-      );
+      const residentSpaces = response.body.filter((space: any) => space.isResident === true);
 
       expect(residentSpaces.length).toBeGreaterThan(0);
       residentSpaces.forEach((space: any) => {
@@ -137,8 +131,7 @@ describe('ParkingSpacesController - Occupation (e2e)', () => {
 
       // Find non-resident car spaces
       const carSpaces = response.body.filter(
-        (space: any) =>
-          space.isResident === false && space.vehicleType === VehicleType.CAR,
+        (space: any) => space.isResident === false && space.vehicleType === VehicleType.CAR,
       );
 
       expect(carSpaces.length).toBeGreaterThan(0);
@@ -156,9 +149,7 @@ describe('ParkingSpacesController - Occupation (e2e)', () => {
 
       // Find non-resident motorcycle spaces
       const motorcycleSpaces = response.body.filter(
-        (space: any) =>
-          space.isResident === false &&
-          space.vehicleType === VehicleType.MOTORCYCLE,
+        (space: any) => space.isResident === false && space.vehicleType === VehicleType.MOTORCYCLE,
       );
 
       expect(motorcycleSpaces.length).toBeGreaterThan(0);
@@ -220,28 +211,20 @@ describe('ParkingSpacesController - Occupation (e2e)', () => {
         .expect(200);
 
       // Find all occupied spaces
-      const occupiedSpaces = response.body.filter(
-        (space: any) => space.isOccupied === true,
-      );
+      const occupiedSpaces = response.body.filter((space: any) => space.isOccupied === true);
 
       expect(occupiedSpaces).toHaveLength(3);
 
       // Verify each occupied space
-      const space1 = occupiedSpaces.find(
-        (s: any) => s.parkingSpaceId === checkIn1.parkingSpaceId,
-      );
+      const space1 = occupiedSpaces.find((s: any) => s.parkingSpaceId === checkIn1.parkingSpaceId);
       expect(space1.vehicleType).toBe(VehicleType.CAR);
       expect(space1.isResident).toBe(false);
 
-      const space2 = occupiedSpaces.find(
-        (s: any) => s.parkingSpaceId === checkIn2.parkingSpaceId,
-      );
+      const space2 = occupiedSpaces.find((s: any) => s.parkingSpaceId === checkIn2.parkingSpaceId);
       expect(space2.vehicleType).toBe(VehicleType.MOTORCYCLE);
       expect(space2.isResident).toBe(false);
 
-      const space3 = occupiedSpaces.find(
-        (s: any) => s.parkingSpaceId === checkIn3.parkingSpaceId,
-      );
+      const space3 = occupiedSpaces.find((s: any) => s.parkingSpaceId === checkIn3.parkingSpaceId);
       expect(space3.vehicleType).toBe(VehicleType.CAR);
       expect(space3.isResident).toBe(true);
     });
@@ -256,7 +239,7 @@ describe('ParkingSpacesController - Occupation (e2e)', () => {
         .set('Authorization', `Bearer ${testData.authToken}`)
         .expect(200);
 
-      let occupiedSpace = response.body.find(
+      const occupiedSpace = response.body.find(
         (space: any) => space.parkingSpaceId === checkInResult.parkingSpaceId,
       );
       expect(occupiedSpace.isOccupied).toBe(true);
@@ -287,9 +270,7 @@ describe('ParkingSpacesController - Occupation (e2e)', () => {
 
   describe('GET /parking-spaces/occupation - Authorization', () => {
     it('should return 401 when no authorization token is provided', async () => {
-      await request(app.getHttpServer())
-        .get('/parking-spaces/occupation')
-        .expect(401);
+      await request(app.getHttpServer()).get('/parking-spaces/occupation').expect(401);
     });
   });
 });

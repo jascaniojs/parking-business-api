@@ -26,7 +26,6 @@ export class Building {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-
   static create(name: string, address: string, totalFloors: number): Building {
     if (!name || name.length === 0) {
       throw new Error('Building name is required');

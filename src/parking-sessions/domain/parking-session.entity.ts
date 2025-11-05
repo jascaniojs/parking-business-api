@@ -50,7 +50,6 @@ export class ParkingSession {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-
   isActive(): boolean {
     return this.checkOutAt === null;
   }
@@ -80,7 +79,6 @@ export class ParkingSession {
 
     return Math.round(totalAmount * 100) / 100;
   }
-
 
   static create(
     parkingSpaceId: number,

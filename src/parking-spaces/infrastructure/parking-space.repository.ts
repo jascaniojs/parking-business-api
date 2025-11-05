@@ -38,14 +38,14 @@ export class ParkingSpaceRepository {
     const query = manager
       .createQueryBuilder(ParkingSpace, 'space')
       .where('space.buildingId = :buildingId', { buildingId })
-      .andWhere('space.currentSessionId IS NULL')
+      .andWhere('space.currentSessionId IS NULL');
 
     if (isResident) {
       query.andWhere('space.isForResidents = true');
     }
 
-    if(!isResident){
-        query.andWhere('space.allowedVehicleType = :vehicleType', { vehicleType });
+    if (!isResident) {
+      query.andWhere('space.allowedVehicleType = :vehicleType', { vehicleType });
     }
 
     return query

@@ -25,11 +25,9 @@ export async function seedUsers(dataSource: DataSource) {
     const savedUser = await userRepository.save(user);
 
     // Generate JWT token
-    const token = jwt.sign(
-      { sub: savedUser.id, email: savedUser.email },
-      jwtSecret,
-      { expiresIn: jwtExpiresIn } as jwt.SignOptions,
-    );
+    const token = jwt.sign({ sub: savedUser.id, email: savedUser.email }, jwtSecret, {
+      expiresIn: jwtExpiresIn,
+    } as jwt.SignOptions);
 
     userTokens[savedUser.email] = {
       email: savedUser.email,

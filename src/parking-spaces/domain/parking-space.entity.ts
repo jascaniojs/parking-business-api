@@ -72,7 +72,6 @@ export class ParkingSpace {
     return `Floor ${this.floor} - Space ${this.number}`;
   }
 
-
   static create(
     buildingId: number,
     floor: number,

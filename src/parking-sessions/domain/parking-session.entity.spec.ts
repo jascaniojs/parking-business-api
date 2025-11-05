@@ -100,7 +100,7 @@ describe('ParkingSession Entity', () => {
 
     it('should use current time when checkOutAt is null', () => {
       const session = ParkingSession.create(1, VehicleType.CAR, false, 5.0);
-      session.checkInAt =  new Date(Date.now() - 3600000);
+      session.checkInAt = new Date(Date.now() - 3600000);
 
       const duration = session.getDurationInHours();
 

@@ -31,7 +31,5 @@ describe('Price Entity', () => {
 
       expect(price.ratePerHour).toBe(4.99);
     });
-
   });
-
 });

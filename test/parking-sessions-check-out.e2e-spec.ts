@@ -5,11 +5,7 @@ import { DataSource } from 'typeorm';
 import { AppModule } from '../src/app.module';
 import { ParkingSpace } from '../src/parking-spaces/domain/parking-space.entity';
 import { VehicleType } from '../src/parking-spaces/domain/vehicle-type.enum';
-import {
-  setupTestDatabase,
-  teardownTestDatabase,
-  clearTestDatabase,
-} from './test-db-setup';
+import { setupTestDatabase, teardownTestDatabase, clearTestDatabase } from './test-db-setup';
 import { seedTestData, TestSeedData } from './helpers/seed-test-data';
 
 describe('ParkingSessionsController - Check-out (e2e)', () => {
@@ -379,6 +375,5 @@ describe('ParkingSessionsController - Check-out (e2e)', () => {
         .send(checkOutDto)
         .expect(401);
     });
-
   });
 });

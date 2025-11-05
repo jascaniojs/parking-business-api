@@ -80,9 +80,7 @@ describe('ParkingSessionsController - Check-in (e2e)', () => {
       });
 
       expect(occupiedSpace).toBeDefined();
-      expect(occupiedSpace!.currentSessionId).toBe(
-        response.body.parkingSessionId,
-      );
+      expect(occupiedSpace!.currentSessionId).toBe(response.body.parkingSessionId);
       expect(occupiedSpace!.isAvailable()).toBe(false);
     });
 
@@ -158,12 +156,8 @@ describe('ParkingSessionsController - Check-in (e2e)', () => {
         .send(checkInDto)
         .expect(201);
 
-      expect(response1.body.parkingSpaceId).not.toBe(
-        response2.body.parkingSpaceId,
-      );
-      expect(response1.body.parkingSessionId).not.toBe(
-        response2.body.parkingSessionId,
-      );
+      expect(response1.body.parkingSpaceId).not.toBe(response2.body.parkingSpaceId);
+      expect(response1.body.parkingSessionId).not.toBe(response2.body.parkingSessionId);
     });
   });
 

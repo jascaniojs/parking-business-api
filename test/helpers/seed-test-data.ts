@@ -36,11 +36,9 @@ export async function seedTestData(dataSource: DataSource): Promise<TestSeedData
 
   // Generate JWT token
   const jwtSecret = process.env.JWT_SECRET || 'test-secret-key';
-  const authToken = jwt.sign(
-    { sub: savedUser.id, email: savedUser.email },
-    jwtSecret,
-    { expiresIn: '1h' },
-  );
+  const authToken = jwt.sign({ sub: savedUser.id, email: savedUser.email }, jwtSecret, {
+    expiresIn: '1h',
+  });
 
   // Create building
   const building = Building.create('Test Building', '123 Test St', 2);
@@ -50,11 +48,7 @@ export async function seedTestData(dataSource: DataSource): Promise<TestSeedData
   const carPrice = Price.create(savedBuilding.id, VehicleType.CAR, 5.0);
   await priceRepository.save(carPrice);
 
-  const motorcyclePrice = Price.create(
-    savedBuilding.id,
-    VehicleType.MOTORCYCLE,
-    3.0,
-  );
+  const motorcyclePrice = Price.create(savedBuilding.id, VehicleType.MOTORCYCLE, 3.0);
   await priceRepository.save(motorcyclePrice);
 
   // Create parking spaces
@@ -66,25 +60,13 @@ export async function seedTestData(dataSource: DataSource): Promise<TestSeedData
 
   // Spaces 11-20: Cars (non-resident)
   for (let i = 11; i <= 20; i++) {
-    const space = ParkingSpace.create(
-      savedBuilding.id,
-      1,
-      i,
-      VehicleType.CAR,
-      false,
-    );
+    const space = ParkingSpace.create(savedBuilding.id, 1, i, VehicleType.CAR, false);
     await parkingSpaceRepository.save(space);
   }
 
   // Spaces 21-25: Motorcycles (non-resident)
   for (let i = 21; i <= 25; i++) {
-    const space = ParkingSpace.create(
-      savedBuilding.id,
-      2,
-      i,
-      VehicleType.MOTORCYCLE,
-      false,
-    );
+    const space = ParkingSpace.create(savedBuilding.id, 2, i, VehicleType.MOTORCYCLE, false);
     await parkingSpaceRepository.save(space);
   }
 

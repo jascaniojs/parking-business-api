@@ -39,7 +39,6 @@ export class Price {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-
   static create(buildingId: number, vehicleType: VehicleType, ratePerHour: number): Price {
     if (!buildingId) {
       throw new Error('Building ID is required');

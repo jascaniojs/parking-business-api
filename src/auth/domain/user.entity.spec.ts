@@ -39,6 +39,5 @@ describe('User Entity', () => {
         User.create('john@@example.com', 'John Doe');
       }).toThrow('Invalid email format');
     });
-
   });
 });

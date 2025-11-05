@@ -1,110 +1,129 @@
 # Parking Business API
 
-A NestJS-based API for parking business management, following Domain-Driven Design principles and clean architecture patterns.
+Parking space management system with real-time occupation tracking and session history analytics.
 
-## Tech Stack
+## Stack
 
-- **NestJS** v11+ - Progressive Node.js framework
-- **TypeScript** v5+ - Type-safe development
-- **PostgreSQL** v16+ - Relational database
-- **TypeORM** v0.3+ - ORM for database operations
-- **Docker** - Local PostgreSQL setup
-- **JWT** - Token-based authentication
-- **Swagger** - API documentation
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 20+
-- Docker and Docker Compose
-- npm or yarn
-
-### Installation
-
-1. Install dependencies:
-```bash
-npm install
-```
-
-2. Start PostgreSQL with Docker:
-```bash
-docker-compose up -d
-```
-
-3. Create and run database migrations:
-```bash
-# Generate initial migration
-npm run migration:generate -- src/database/migrations/InitialSchema
-
-# Run migrations
-npm run migration:run
-```
-
-4. Seed the database with test users:
-```bash
-npm run seed
-```
-
-This will create a `users.json` file with JWT tokens for authentication.
-
-### Development
-
-Start the development server:
-```bash
-npm run start:dev
-```
-
-The API will be available at:
-- **API**: http://localhost:3000
-- **Swagger Documentation**: http://localhost:3000/api/docs
-
-### Available Scripts
-
-- `npm run start:dev` - Start development server with hot reload
-- `npm run build` - Build the application
-- `npm run start:prod` - Start production server
-- `npm run lint` - Lint code
-- `npm run format` - Format code with Prettier
-- `npm run test` - Run unit tests
-- `npm run test:e2e` - Run E2E tests
-- `npm run test:cov` - Run tests with coverage
-
-### Database Scripts
-
-- `npm run migration:generate -- src/database/migrations/<name>` - Generate migration from entities
-- `npm run migration:create -- src/database/migrations/<name>` - Create empty migration
-- `npm run migration:run` - Run pending migrations
-- `npm run migration:revert` - Revert last migration
-- `npm run seed` - Seed database with test data
+- **Backend:** NestJS v11+ + TypeScript v5+
+- **Database:** PostgreSQL v16+ with TypeORM v0.3+
+- **Infrastructure:** Docker (local development)
+- **Auth:** JWT with Passport
+- **Views:** Handlebars (dashboard UI)
+- **Docs:** Swagger/OpenAPI
 
 ## Project Structure
 
 ```
-src/
-├── auth/                    # Authentication module
-│   ├── domain/             # User domain entity
-│   ├── infrastructure/     # User repository & ORM entity
-│   └── interface/          # JWT strategy, guards, decorators
-├── shared/                 # Shared infrastructure
-│   ├── config/            # Configuration files
-│   ├── filters/           # Global exception filters
-│   └── decorators/        # Custom decorators
-├── database/              # Database related
-│   ├── migrations/        # TypeORM migrations
-│   └── seeds/            # Database seeders
-└── main.ts               # Application entry point
+├── src/                    # Application code
+├── test/                   # E2E tests + helpers
+├── views/                  # Handlebars templates
+└── scripts/                # Seed scripts
 ```
 
-## Authentication
+## Architecture
 
-This API uses pre-seeded JWT authentication. After running `npm run seed`, tokens are saved in `users.json`.
+Domain-Driven Design organized by feature:
 
-### Using Authentication
+```
+src/
+├── auth/                   # Authentication & users
+├── parking-sessions/       # Session management (check-in/out, history)
+├── parking-spaces/         # Space management & occupation tracking
+├── buildings/              # Building management
+├── prices/                 # Pricing rules
+└── shared/                 # Infrastructur
 
-Include the JWT token in the Authorization header:
+Each domain follows:
+- `domain/` - Business logic & entities
+- `infrastructure/` - TypeORM repositories
+- `interface/` - REST controllers & DTOs
+
+## Local Development
+
+### Prerequisites
+
+- Node.js 20+
+- Docker (for PostgreSQL)
+- npm or yarn
+
+### Setup
+
 ```bash
-curl -H "Authorization: Bearer <token>" http://localhost:3000/api/endpoint
+# Install dependencies
+npm install
+
+# Copy environment file
+cp .env.example .env
+
+# Start PostgreSQL
+docker-compose up -d
+
+# Run migrations
+npm run migration:run
+
+# Seed test users
+npm run seed
+```
+
+API runs at http://localhost:3000
+
+### Test Users
+
+After seeding, tokens are saved in `users.json`:
+- **Admin:** `admin@parking.com` (access to history endpoint)
+- **User:** `user@parking.com`
+
+### Testing
+
+```bash
+npm test                    # Unit tests
+npm run test:cov           # Coverage report
+npm run test:e2e           # E2E tests
+npm run test:watch         # Watch mode
+```
+
+## API Endpoints
+
+### Parking Sessions
+- `POST /parking-sessions/check-in` - Start parking session (auth required)
+- `POST /parking-sessions/check-out` - End session and calculate charge (auth required)
+- `GET /parking-sessions/history` - Session history with pagination (admin only)
+
+### Parking Spaces
+- `GET /parking-spaces/occupation` - Real-time occupation status (auth required)
+- `GET /parking-spaces/dashboard/:buildingId` - Visual dashboard (public, HTML)
+
+**Authentication:** All endpoints except dashboard require JWT token in `Authorization: Bearer <token>` header. Get tokens from `users.json` after running `npm run seed`.
+
+**Swagger Docs:** http://localhost:3000/api/docs
+
+## Scripts
+
+### Development
+```bash
+npm run start:dev          # Dev server with hot reload
+npm run build              # Build application
+npm run start:prod         # Production server
+npm run lint               # Lint code
+npm run format             # Format with Prettier
+```
+
+### Database
+```bash
+npm run migration:generate -- src/database/migrations/<name>
+npm run migration:create -- src/database/migrations/<name>
+npm run migration:run      # Run pending migrations
+npm run migration:revert   # Revert last migration
+npm run migration:show     # Show migration status
+npm run seed               # Seed test users
+```
+
+### Testing
+```bash
+npm test                   # Unit tests
+npm run test:watch         # Watch mode
+npm run test:cov           # Coverage report
+npm run test:e2e           # E2E tests
 ```
 
 ## Environment Variables
@@ -115,12 +134,17 @@ Copy `.env.example` to `.env` and configure:
 NODE_ENV=development
 PORT=3000
 
+# Database
 DB_HOST=localhost
 DB_PORT=5432
 DB_USERNAME=postgres
 DB_PASSWORD=postgres
 DB_DATABASE=parking_dev
 
-JWT_SECRET=your-secret-key
+# Authentication
+JWT_SECRET=your-secret-key-change-this-in-production
 JWT_EXPIRES_IN=7d
+
+# API Documentation
+SWAGGER_ENABLED=true
 ```

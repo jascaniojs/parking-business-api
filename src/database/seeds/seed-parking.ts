@@ -54,9 +54,7 @@ export async function seedParking(dataSource: DataSource) {
       pricingData.ratePerHour,
     );
     const savedPrice = await priceRepository.save(price);
-    console.log(
-      `✅ Created pricing: ${savedPrice.vehicleType} - €${savedPrice.ratePerHour}/hour`,
-    );
+    console.log(`✅ Created pricing: ${savedPrice.vehicleType} - €${savedPrice.ratePerHour}/hour`);
   }
 
   console.log('\nCreating parking spaces...');
@@ -82,9 +80,7 @@ export async function seedParking(dataSource: DataSource) {
     const description = spaceConfig.isForResidents
       ? 'resident spaces'
       : `${spaceConfig.allowedVehicleType} spaces`;
-    console.log(
-      `✅ Created spaces ${start}-${end}: Floor ${spaceConfig.floor}, ${description}`,
-    );
+    console.log(`✅ Created spaces ${start}-${end}: Floor ${spaceConfig.floor}, ${description}`);
   }
 
   console.log(`\n✅ Successfully created ${totalSpaces} parking spaces!`);
