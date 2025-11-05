@@ -32,7 +32,7 @@ src/
 ├── buildings/              # Building management
 ├── prices/                 # Pricing rules
 └── shared/                 # Infrastructur
-
+```
 Each domain follows:
 - `domain/` - Business logic & entities
 - `infrastructure/` - TypeORM repositories
@@ -47,7 +47,11 @@ Each domain follows:
 - npm or yarn
 
 ### Setup
-
+#### Quick Start
+```bash
+npm run start:init
+```
+#### Manual Setup
 ```bash
 # Install dependencies
 npm install
@@ -67,11 +71,14 @@ npm run seed
 
 API runs at http://localhost:3000
 
-### Test Users
-
+### Test Data
+#### Test Users
 After seeding, tokens are saved in `users.json`:
 - **Admin:** `admin@parking.com` (access to history endpoint)
 - **User:** `user@parking.com`
+#### Test Buildings
+After seeding, buildings are saved in `buildings.json`:
+- Use building id's in requests when needed.
 
 ### Testing
 
@@ -96,6 +103,8 @@ npm run test:watch         # Watch mode
 **Authentication:** All endpoints except dashboard require JWT token in `Authorization: Bearer <token>` header. Get tokens from `users.json` after running `npm run seed`.
 
 **Swagger Docs:** http://localhost:3000/api/docs
+
+**Postman:** Import OpenAPI spec from http://localhost:3000/api/docs-json into Postman for manual testing
 
 ## Scripts
 
