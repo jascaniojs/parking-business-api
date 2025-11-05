@@ -8,11 +8,7 @@ import { ParkingSpacesModule } from '../parking-spaces/parking-spaces.module';
 import { PricesModule } from '../prices/prices.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ParkingSession]),
-    ParkingSpacesModule,
-    PricesModule,
-  ],
+  imports: [TypeOrmModule.forFeature([ParkingSession]), ParkingSpacesModule, PricesModule],
   providers: [ParkingSessionRepository, ParkingSessionsService],
   controllers: [ParkingSessionsController],
   exports: [ParkingSessionRepository, ParkingSessionsService],

@@ -1,4 +1,13 @@
-import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  HttpStatus,
+  Get,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -9,12 +18,16 @@ import {
   ApiNotFoundResponse,
   ApiBadRequestResponse,
   ApiUnprocessableEntityResponse,
+  ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import { ParkingSessionsService } from '../domain/parking-sessions.service';
 import { CheckInDto } from './dtos/check-in.dto';
 import { CheckInResponseDto } from './dtos/check-in-response.dto';
 import { CheckOutDto } from './dtos/check-out.dto';
 import { CheckOutResponseDto } from './dtos/check-out-response.dto';
+import { HistoryQueryDto } from './dtos/history-query.dto';
+import { PaginatedHistoryResponseDto } from './dtos/paginated-history-response.dto';
+import { AdminGuard } from '../../auth/interface/guards/admin.guard';
 
 @ApiTags('parking-sessions')
 @ApiBearerAuth('JWT')
@@ -118,5 +131,42 @@ export class ParkingSessionsController {
   })
   async checkOut(@Body() checkOutDto: CheckOutDto): Promise<CheckOutResponseDto> {
     return this.parkingSessionsService.checkOut(checkOutDto);
+  }
+
+  @Get('history')
+  @UseGuards(AdminGuard)
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Get parking session history (Admin only)',
+    description:
+      'Retrieves completed non-resident parking sessions with pagination and optional filters. Requires admin privileges.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Parking session history retrieved successfully',
+    type: PaginatedHistoryResponseDto,
+  })
+  @ApiForbiddenResponse({
+    description: 'Access denied. Admin privileges required.',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: { type: 'number', example: 403 },
+        message: { type: 'string', example: 'Access denied. Admin privileges required.' },
+      },
+    },
+  })
+  @ApiInternalServerErrorResponse({
+    description: 'Error retrieving parking session history',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: { type: 'number', example: 500 },
+        message: { type: 'string', example: 'Error retrieving parking session history.' },
+      },
+    },
+  })
+  async getHistory(@Query() queryDto: HistoryQueryDto): Promise<PaginatedHistoryResponseDto> {
+    return this.parkingSessionsService.getHistory(queryDto);
   }
 }

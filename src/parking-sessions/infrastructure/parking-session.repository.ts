@@ -52,4 +52,44 @@ export class ParkingSessionRepository {
   async delete(id: string): Promise<void> {
     await this.repository.delete(id);
   }
+
+  async findCompletedNonResidentSessions(
+    filters: {
+      startDate?: Date;
+      endDate?: Date;
+      parkingSpaceId?: number;
+    },
+    page: number,
+    limit: number,
+  ): Promise<[ParkingSession[], number]> {
+    const queryBuilder = this.repository
+      .createQueryBuilder('session')
+      .where('session.isResident = :isResident', { isResident: false })
+      .andWhere('session.checkOutAt IS NOT NULL');
+
+    if (filters.startDate) {
+      queryBuilder.andWhere('session.checkOutAt >= :startDate', {
+        startDate: filters.startDate,
+      });
+    }
+
+    if (filters.endDate) {
+      queryBuilder.andWhere('session.checkOutAt <= :endDate', {
+        endDate: filters.endDate,
+      });
+    }
+
+    if (filters.parkingSpaceId) {
+      queryBuilder.andWhere('session.parkingSpaceId = :parkingSpaceId', {
+        parkingSpaceId: filters.parkingSpaceId,
+      });
+    }
+
+    queryBuilder
+      .orderBy('session.checkOutAt', 'DESC')
+      .skip((page - 1) * limit)
+      .take(limit);
+
+    return queryBuilder.getManyAndCount();
+  }
 }

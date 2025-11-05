@@ -14,6 +14,9 @@ import { CheckInDto } from '../interface/dtos/check-in.dto';
 import { CheckInResponseDto } from '../interface/dtos/check-in-response.dto';
 import { CheckOutDto } from '../interface/dtos/check-out.dto';
 import { CheckOutResponseDto } from '../interface/dtos/check-out-response.dto';
+import { HistoryQueryDto } from '../interface/dtos/history-query.dto';
+import { PaginatedHistoryResponseDto } from '../interface/dtos/paginated-history-response.dto';
+import { HistoryResponseDto } from '../interface/dtos/history-response.dto';
 import { ParkingSession } from './parking-session.entity';
 import { ParkingSpace } from '../../parking-spaces/domain/parking-space.entity';
 
@@ -74,10 +77,7 @@ export class ParkingSessionsService {
         };
       });
     } catch (error) {
-      if (
-        error instanceof ConflictException ||
-        error instanceof InternalServerErrorException
-      ) {
+      if (error instanceof ConflictException || error instanceof InternalServerErrorException) {
         throw error;
       }
 
@@ -106,10 +106,10 @@ export class ParkingSessionsService {
       }
 
       return await this.dataSource.transaction(async (entityManager) => {
-          const parkingSpace = await this.parkingSpaceRepository.findById(session.parkingSpaceId);
-          if (!parkingSpace) {
-              throw new NotFoundException('Parking space not found.');
-          }
+        const parkingSpace = await this.parkingSpaceRepository.findById(session.parkingSpaceId);
+        if (!parkingSpace) {
+          throw new NotFoundException('Parking space not found.');
+        }
         session.checkOut();
         await entityManager.save(ParkingSession, session);
         parkingSpace.release();
@@ -133,5 +133,29 @@ export class ParkingSessionsService {
 
       throw new InternalServerErrorException('Error finishing parking session.');
     }
+  }
+
+  async getHistory(queryDto: HistoryQueryDto): Promise<PaginatedHistoryResponseDto> {
+    const { page = 1, limit = 20, startDate, endDate, parkingSpaceId } = queryDto;
+
+    const [sessions, total] = await this.parkingSessionRepository.findCompletedNonResidentSessions(
+      { startDate, endDate, parkingSpaceId },
+      page,
+      limit,
+    );
+
+    const data = sessions.map((session) => HistoryResponseDto.fromEntity(session));
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+      },
+    };
   }
 }
