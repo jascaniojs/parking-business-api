@@ -19,6 +19,9 @@ yarn-error.log*
 # JWT tokens
 users.json
 
+# Seed data
+buildings.json
+
 # Test coverage
 coverage
 .nyc_output

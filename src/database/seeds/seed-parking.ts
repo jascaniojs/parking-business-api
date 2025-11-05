@@ -84,4 +84,18 @@ export async function seedParking(dataSource: DataSource) {
   }
 
   console.log(`\n✅ Successfully created ${totalSpaces} parking spaces!`);
+
+  const buildingsData = [
+    {
+      id: savedBuilding.id,
+      name: savedBuilding.name,
+      address: savedBuilding.address,
+      totalFloors: savedBuilding.totalFloors,
+      totalSpaces,
+    },
+  ];
+
+  const buildingsFilePath = path.join(process.cwd(), 'buildings.json');
+  fs.writeFileSync(buildingsFilePath, JSON.stringify(buildingsData, null, 2), 'utf-8');
+  console.log(`\n✅ Building details exported to buildings.json`);
 }
